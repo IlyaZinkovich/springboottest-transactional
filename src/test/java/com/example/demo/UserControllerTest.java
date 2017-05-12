@@ -44,6 +44,7 @@ public class UserControllerTest {
 				.when()
 				.get(String.format(endpoint, port));
 		Assert.assertEquals(200, response.getStatusCode());
+		Assert.assertEquals("corey", response.jsonPath().get("name"));
 	}
 
 	@Test
@@ -52,6 +53,7 @@ public class UserControllerTest {
 				.when()
 				.get(String.format(endpoint, port));
 		Assert.assertEquals(200, response.getStatusCode());
+		Assert.assertEquals("corey", response.jsonPath().get("name"));
 	}
 
 }
