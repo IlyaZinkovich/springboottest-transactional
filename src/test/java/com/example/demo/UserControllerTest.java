@@ -12,6 +12,8 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,24 +21,15 @@ import javax.sql.DataSource;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@Transactional
+@SqlGroup({
+		@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/testbed.sql"),
+		@Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/clear.sql") })
 public class UserControllerTest {
 
 	@LocalServerPort
 	private int port;
 
-	@Value("classpath:testbed.sql")
-	private Resource testbed;
-
-	@Autowired
-	private DataSource dataSource;
-
 	private static final String endpoint = "http://localhost:%s/users";
-
-	@Before
-	public void before() {
-		new ResourceDatabasePopulator(testbed).execute(dataSource);
-	}
 
 	@Test
 	public void get() {
@@ -55,5 +48,5 @@ public class UserControllerTest {
 		Assert.assertEquals(200, response.getStatusCode());
 		Assert.assertEquals("corey", response.jsonPath().get("name"));
 	}
-
 }
+
